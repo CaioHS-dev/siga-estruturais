@@ -13,25 +13,19 @@ import java.util.List;
  */
 public class ImportadorAlunos {
 
-    private final SecretariaLegadoWS servicoLegado;
+    // Agora depende da interface, e não mais da classe concreta do legado
+    private final FonteDeAlunos fonte;
     private final AlunoDAO dao;
 
-    public ImportadorAlunos(SecretariaLegadoWS servicoLegado, AlunoDAO dao) {
-        this.servicoLegado = servicoLegado;
+    public ImportadorAlunos(FonteDeAlunos fonte, AlunoDAO dao) {
+        this.fonte = fonte;
         this.dao = dao;
     }
 
     public int importar() {
-        List<Aluno> alunos = new ArrayList<>();
-
-        for (String[] linha : servicoLegado.consultarTabelaAlunos()) {
-            Aluno aluno = new Aluno(linha[0], linha[1]);
-            aluno.setAtivo("A".equals(linha[2]));   // não trata a letra minúscula
-            alunos.add(aluno);
-        }
-
         int importados = 0;
-        for (Aluno aluno : alunos) {
+        // Puxa a lista de alunos já convertida e instanciada pelo Adaptador
+        for (Aluno aluno : fonte.listar()) {
             dao.inserir(aluno);
             importados++;
         }
