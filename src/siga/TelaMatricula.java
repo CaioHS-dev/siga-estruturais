@@ -9,49 +9,18 @@ package siga;
  */
 public class TelaMatricula {
 
-    private final ValidadorCpf validadorCpf;
-    private final AlunoDAO alunoDAO;
-    private final ControleVagas controleVagas;
-    private final CalculadoraDesconto calculadoraDesconto;
-    private final MatriculaDAO matriculaDAO;
-    private final NotificadorEmail notificador;
+    private final FachadaMatricula fachada;
 
-    public TelaMatricula(ValidadorCpf validadorCpf, AlunoDAO alunoDAO,
-                         ControleVagas controleVagas,
-                         CalculadoraDesconto calculadoraDesconto,
-                         MatriculaDAO matriculaDAO,
-                         NotificadorEmail notificador) {
-        this.validadorCpf = validadorCpf;
-        this.alunoDAO = alunoDAO;
-        this.controleVagas = controleVagas;
-        this.calculadoraDesconto = calculadoraDesconto;
-        this.matriculaDAO = matriculaDAO;
-        this.notificador = notificador;
+    public TelaMatricula(FachadaMatricula fachada) {
+        this.fachada = fachada;
     }
 
     public void aoClicarEmMatricular(String matricula, String cpf, String codigoTurma) {
         try {
-            if (!validadorCpf.valido(cpf)) {
-                throw new IllegalArgumentException("CPF inválido.");
-            }
-            Aluno aluno = alunoDAO.buscarPorMatricula(matricula);
-            if (aluno == null) {
-                throw new IllegalStateException("Aluno não encontrado: " + matricula);
-            }
-            if (!controleVagas.haVaga(codigoTurma)) {
-                throw new IllegalStateException("Turma sem vagas: " + codigoTurma);
-            }
-
-            double desconto = calculadoraDesconto.calcular(aluno);
-            Matricula nova = new Matricula(aluno, codigoTurma, desconto);
-
-            matriculaDAO.inserir(nova);
-            controleVagas.reservar(codigoTurma);
-            notificador.enviarConfirmacao(aluno, nova);
-
-            System.out.println("   [tela] Matrícula realizada: " + nova);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.out.println("   [tela] Erro: " + e.getMessage());
+            fachada.matricular(matricula, cpf, codigoTurma);
+            System.out.println("   [Tela] Matrícula processada com sucesso: " + matricula + " em " + codigoTurma);
+        } catch (Exception e) {
+            System.out.println("   [Tela] Erro na matrícula de " + matricula + ": " + e.getMessage());
         }
     }
 }
