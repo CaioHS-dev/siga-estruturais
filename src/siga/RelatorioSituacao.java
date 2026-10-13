@@ -9,18 +9,15 @@ package siga;
  */
 public class RelatorioSituacao {
 
-    private final SecretariaLegadoWS servicoLegado;
+    private final FonteDeAlunos fonte;
 
-    public RelatorioSituacao(SecretariaLegadoWS servicoLegado) {
-        this.servicoLegado = servicoLegado;
+    public RelatorioSituacao(FonteDeAlunos fonte) {
+        this.fonte = fonte;
     }
 
     public void imprimir() {
-        System.out.println("   Situação segundo o relatório:");
-        for (String[] linha : servicoLegado.consultarTabelaAlunos()) {
-            Aluno aluno = new Aluno(linha[0], linha[1]);
-            aluno.setAtivo("A".equalsIgnoreCase(linha[2]));   // aqui trata
-            System.out.println("     " + aluno);
+        for (Aluno aluno : fonte.listar()) {
+            System.out.println("Situação - " + aluno.getMatricula() + ": " + (aluno.isAtivo() ? "ATIVA" : "INATIVA"));
         }
     }
 }
